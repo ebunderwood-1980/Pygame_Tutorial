@@ -25,9 +25,13 @@ display_surface.fill(GREEN)
 #Draw various shapes on the display surface
 #Line(surface, color, starting point, ending point, thickness)
 pygame.draw.line(display_surface, RED, (0,0), (90, 90), 5)
+
 #Circle(surface, color, center, radius, thickness 0 for fill)
 pygame.draw.circle(display_surface, YELLOW, (WIDTH//2, HEIGHT//2), 60, 0)  #Filled circle
 pygame.draw.circle(display_surface, WHITE, (100, 100), 50, 5)  #Circle with 5pt. white line
+
+#Rectangle(surface, color, top lef x, top left y, width, height)
+pygame.draw.rect(display_surface, BLACK, (10, 10, 50, 50))
 
 #Main game loop
 running = True
