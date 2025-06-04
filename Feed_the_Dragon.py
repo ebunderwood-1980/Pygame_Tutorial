@@ -58,6 +58,14 @@ actual_score_text = game_font.render(str(actual_score), True, GREEN, DARK_GREEN)
 actual_score_rect = actual_score_text.get_rect()
 actual_score_rect.center = (185, 50)
 
+game_over_text = game_font.render("GAME OVER", True, GREEN, DARK_GREEN)
+game_over_rect = game_over_text.get_rect()
+game_over_rect.center = (W//2, H//2) 
+
+continue_text = game_font.render("Hit any button to play again", True, GREEN, DARK_GREEN)
+continue_text_rect = continue_text.get_rect()
+continue_text_rect.center = (W//2, H//2 + 34)
+
 # Add dragon image
 dragon = pygame.image.load('dragon_right.png')
 dragon_rect = dragon.get_rect()
@@ -111,6 +119,30 @@ while running:
         coin_rect.x = W-40 
         coin_rect.y = random.randint(120, H-32)
 
+    # Check for game over condition and restart as necessary
+    if actual_lives <= 0:
+        game_board.blit(game_over_text, game_over_rect)
+        game_board.blit(continue_text, continue_text_rect)
+        pygame.display.update()  
+
+        # Pause game until player presses a key, then reset the game.
+        pygame.mixer.music.stop()
+        is_paused = True
+        while is_paused:
+            for event in pygame.event.get():
+                if event.type == pygame.KEYDOWN:
+                    actual_lives = 5
+                    actual_lives_text = game_font.render(str(actual_lives), True, GREEN, DARK_GREEN)
+                    actual_score = 0
+                    actual_score_text = game_font.render(str(actual_score), True, GREEN, DARK_GREEN)
+                    dragon_rect.y = W//2
+                    V =  5
+                    pygame.mixer.music.play(-1, 0.0)
+                    is_paused = False
+                if event.type == pygame.QUIT:
+                    is_paused = False
+                    running = False
+        
     # Fill the gameboard to cover up old images
     game_board.fill(BLACK)
 
