@@ -1,152 +1,159 @@
-import pygame
-import random
+import pygame, random
 
-# Initialize Pygame
+#Initialize pygame
 pygame.init()
 
-# Set up the display surface
-W = 967
-H = 655
-game_board = pygame.display.set_mode((W, H))
+#Set display surface
+WINDOW_WIDTH = 945
+WINDOW_HEIGHT = 600
+display_surface = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 pygame.display.set_caption("Catch the Clown")
 
-# Set FPS and clock
+#Set FPS and clock
 FPS = 60
 clock = pygame.time.Clock()
 
-# Set game values
-STARTING_LIVES = 5
-CLOWN_STARTING_VELO = 5
-CLOWN_ACCELERATION = 1
-CLOWN_START = (900, 100)
-STARTING_SCORE = 0
+#Set game values
+PLAYER_STARTING_LIVES = 5
+CLOWN_STARTING_VELOCITY = 5
+CLOWN_ACCERLATION = 1
 
-score = STARTING_SCORE
-lives = STARTING_LIVES
-clown_velo_x = CLOWN_STARTING_VELO 
-clown_velo_y = CLOWN_STARTING_VELO
+score = 0
+player_lives = PLAYER_STARTING_LIVES
+
+clown_velocity = CLOWN_STARTING_VELOCITY
 clown_dx = random.choice([-1, 1])
 clown_dy = random.choice([-1, 1])
 
-# Colors
-BLACK = (0, 0, 0)
+#Set colors
+BLUE = (1, 175, 209)
 YELLOW = (248, 231, 28)
-LT_BLUE = (1, 175, 209)
 
-# Load sound effects and music
-click = pygame.mixer.Sound('click_sound.wav')
-miss = pygame.mixer.Sound('miss_sound.wav')
-pygame.mixer.music.load('ctc_background_music.wav')
-pygame.mixer.music.set_volume(0.3)
-click.set_volume(0.2)
-miss.set_volume(0.2)
+#Set fonts
+font = pygame.font.Font("Franxurter.ttf", 32)
 
-# Load image assets
-img_clown = pygame.image.load('clown.png')
-img_clown_rect = img_clown.get_rect()
-img_clown_rect.center = CLOWN_START
+#Set text
+title_text = font.render("Catch the Clown", True, BLUE)
+title_rect = title_text.get_rect()
+title_rect.topleft = (50, 10)
 
-background = pygame.image.load('background.png')
-background_rect = background.get_rect()
+score_text = font.render("Score: " + str(score), True, YELLOW)
+score_rect = score_text.get_rect()
+score_rect.topright = (WINDOW_WIDTH - 50, 10)
+
+lives_text = font.render("Lives: " + str(player_lives), True, YELLOW)
+lives_rect = lives_text.get_rect()
+lives_rect.topright = (WINDOW_WIDTH - 50, 50)
+
+game_over_text = font.render("GAMEOVER", True, BLUE, YELLOW)
+game_over_rect = game_over_text.get_rect()
+game_over_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
+
+continue_text = font.render("Click anywhere to play again", True, YELLOW, BLUE)
+continue_rect = continue_text.get_rect()
+continue_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2 + 64)
+
+#Set sound and music
+click_sound = pygame.mixer.Sound("click_sound.wav")
+miss_sound = pygame.mixer.Sound("miss_sound.wav")
+pygame.mixer.music.load("ctc_background_music.wav")
+
+#Set images
+background_image = pygame.image.load("background.png")
+background_rect = background_image.get_rect()
 background_rect.topleft = (0, 0)
 
-# Load font
-font = pygame.font.Font('Franxurter.ttf', 32)
+clown_image = pygame.image.load("clown.png")
+clown_rect = clown_image.get_rect()
+clown_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
 
-# Render game texts
-left_text = font.render("CATCH THE CLOWN", True, LT_BLUE)
-left_text_rect = left_text.get_rect()
-left_text_rect.topleft = (10, 10)
-
-score_text = font.render("SCORE:  " + str(score), True, YELLOW)
-score_text_rect = score_text.get_rect()
-score_text_rect.topright = (W - 10, 10)
-
-lives_text = font.render("LIVES:  " + str(lives), True, YELLOW)
-lives_text_rect = lives_text.get_rect()
-lives_text_rect.topright = (W - 10, 50) 
-
-game_over_text = font.render("GAME OVER", True, LT_BLUE)
-game_over_rect = game_over_text.get_rect()
-game_over_rect.center = (W//4, H//2)
-
-play_again_text = font.render("PRESS ANY KEY TO RESTART", True, YELLOW)
-play_again_rect = play_again_text.get_rect()
-play_again_rect.center = (3 * (W//4), H//2)
-
-# Main game loop
+#The main game loop
 pygame.mixer.music.play(-1, 0.0)
 running = True
 while running:
+    #Check to see if the user wants to quit
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    # Get a list of all keys currently being held
-    keys = pygame.key.get_pressed()
+        #A click is made
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_x = event.pos[0]
+            mouse_y = event.pos[1]
 
-    # Search for Q to quit
-    if keys[pygame.K_q]:
-        running = False
+            #The clown was clicked
+            if clown_rect.collidepoint(mouse_x, mouse_y):
+                click_sound.play()
+                score += 1
+                clown_velocity += CLOWN_ACCERLATION
 
-    # Blit Assets to the game board
-    game_board.blit(background, background_rect)
-    game_board.blit(left_text, left_text_rect)
-    game_board.blit(score_text, score_text_rect)
-    game_board.blit(lives_text, lives_text_rect)
-    game_board.blit(img_clown, img_clown_rect)
+                #Move the clown in a new direction
+                previous_dx = clown_dx
+                previous_dy = clown_dy
+                while(previous_dx == clown_dx and previous_dy == clown_dy):
+                    clown_dx = random.choice([-1, 1])
+                    clown_dy = random.choice([-1, 1])
+            #We missed the clown
+            else:
+                miss_sound.play()
+                player_lives -= 1
 
-    # Move the clown around the board
-    img_clown_rect.x -= clown_velo_x
-    img_clown_rect.y += clown_velo_y
-    if img_clown_rect.left <= 0 or img_clown_rect.right >= W:
-        clown_velo_x = clown_velo_x * -1
-    if img_clown_rect.top <= 0 or img_clown_rect.bottom >= H:
-        clown_velo_y = clown_velo_y * -1
+    #Move the clown
+    clown_rect.x += clown_dx*clown_velocity
+    clown_rect.y += clown_dy*clown_velocity
 
-    # Check for mouse clicks and collisions with the clown
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        mouseX = event.pos[0]
-        mouseY = event.pos[1]
-        if img_clown_rect.collidepoint(mouseX, mouseY):
-            print("Hit")
-            score += 1
-            score_text = font.render("Score:  " + str(score), True, YELLOW, LT_BLUE) 
-            click.play()
-        else:
-            print("Miss")
-            lives -= 1
-            lives_text = font.render("Lives:  " + str(lives), True, YELLOW, LT_BLUE) 
-            miss.play()
+    #Bounce the clown off the edges of the display
+    if clown_rect.left <= 0 or clown_rect.right >= WINDOW_WIDTH:
+        clown_dx = -1*clown_dx
+    if clown_rect.top <= 0 or clown_rect.bottom >= WINDOW_HEIGHT:
+        clown_dy = -1*clown_dy
 
-    # Check for endgame and handle if lives < 0
-    if lives <= 0:
-        game_board.blit(game_over_text, game_over_rect)
-        game_board.blit(play_again_text, play_again_rect)
+    #Update HUD
+    score_text = font.render("Score: " + str(score), True, YELLOW)
+    lives_text = font.render("Lives: " + str(player_lives), True, YELLOW)
+
+    #Check for game over
+    if player_lives == 0:
+        display_surface.blit(game_over_text, game_over_rect)
+        display_surface.blit(continue_text, continue_rect)
         pygame.display.update()
 
-        # Pause game until user presses a key or quits the game
+        #Pause the game until the player clicks then reset the game
         pygame.mixer.music.stop()
         is_paused = True
         while is_paused:
             for event in pygame.event.get():
-                if event.type == pygame.KEYDOWN:
-                    lives = STARTING_LIVES
-                    score = STARTING_SCORE 
-                    clown_velo_x = CLOWN_STARTING_VELO 
-                    clown_velo_y = CLOWN_STARTING_VELO
-                    img_clown_rect.center = CLOWN_START 
-                    pygame.mixer.music.play(-1, 0.0)  
+                #The player wants to play again.
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    score = 0
+                    player_lives = PLAYER_STARTING_LIVES
+
+                    clown_rect.center = (WINDOW_WIDTH//2, WINDOW_HEIGHT//2)
+                    clown_velocity = CLOWN_STARTING_VELOCITY
+                    clown_dx = random.choice([-1, 1])
+                    clown_dy = random.choice([-1, 1])
+
+                    pygame.mixer.music.play(-1, 0.0)
                     is_paused = False
+                #The player wants to quit
                 if event.type == pygame.QUIT:
                     is_paused = False
                     running = False
-                    
-    # Update the display
-    pygame.display.update()
-    
-    clock.tick(FPS)
-    
-# Exit Pygame
-pygame.quit()
+             
+    #Blit the background
+    display_surface.blit(background_image, background_rect)
 
+    #Blit HUD
+    display_surface.blit(title_text, title_rect)
+    display_surface.blit(score_text, score_rect)
+    display_surface.blit(lives_text, lives_rect)
+
+    #Blit assets
+    display_surface.blit(clown_image, clown_rect)
+
+    #Update display and tick clock
+    pygame.display.update()
+    clock.tick(FPS)
+
+#End the game
+pygame.quit()
