@@ -116,6 +116,10 @@ while running:
 
     # Move the burger
     burger_rect.y += current_burger_velocity
+    burger_points = HEIGHT - burger_rect.centery
+    burger_points_text = font.render(
+        "Burger Points:  " + str(burger_points), True, DARK_YELLOW
+    )
 
     # Check to see if the burger hits the bottom
     if burger_rect.bottom >= HEIGHT:
@@ -132,10 +136,8 @@ while running:
         )
         burger_rect.top = -50
         burger_rect.x = random.randint(33, WIDTH - 33)
-        burger_points += HEIGHT - dog_rect.y
-        burger_points_text = font.render(
-            "Burger Points:  " + str(burger_points), True, DARK_YELLOW
-        )
+        score += burger_points
+        score_text = font.render("Score:  " + str(score), True, DARK_YELLOW)
 
     # Move the doggo
     if keys[pygame.K_UP] and dog_rect.top > 85:
@@ -155,6 +157,13 @@ while running:
     else:
         current_dog_velocity = STARTING_DOG_VELOCITY
 
+    # Update the HUD
+    score_text = font.render("Score:  " + str(score), True, DARK_YELLOW)
+    lives_text = font.render("Lives:  " + str(lives), True, DARK_YELLOW)
+    burgers_eaten_text = font.render(
+        "Burgers Eaten:  " + str(burgers_eaten), True, DARK_YELLOW
+    )
+
     # Check to see if game is over
     if lives <= 0:
         surface_display.blit(game_over_text, game_over_rect)
@@ -168,6 +177,10 @@ while running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     pygame.mixer.music.play(-1, 0.0)
+                    lives = START_LIVES
+                    boost = START_BOOST
+                    score = 0
+                    burgers_eaten = 0
                     is_paused = False
                 if event.type == pygame.QUIT:
                     is_paused = False
