@@ -138,6 +138,7 @@ while running:
         burger_rect.x = random.randint(33, WIDTH - 33)
         score += burger_points
         score_text = font.render("Score:  " + str(score), True, DARK_YELLOW)
+        current_burger_velocity += 0.5
 
     # Move the doggo
     if keys[pygame.K_UP] and dog_rect.top > 85:
@@ -165,7 +166,7 @@ while running:
     )
 
     # Check to see if game is over
-    if lives <= 0:
+    if lives == 0:
         surface_display.blit(game_over_text, game_over_rect)
         surface_display.blit(play_again_text, play_again_rect)
         pygame.display.update()
@@ -179,6 +180,7 @@ while running:
                     pygame.mixer.music.play(-1, 0.0)
                     lives = START_LIVES
                     boost = START_BOOST
+                    current_burger_velocity = STARTING_BURGER_VELOCIY
                     score = 0
                     burgers_eaten = 0
                     is_paused = False
