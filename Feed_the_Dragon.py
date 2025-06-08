@@ -5,10 +5,10 @@ import random
 pygame.init()
 
 # Create display surfaces
-W = 1900 
+W = 1900
 H = 1200
 game_board = pygame.display.set_mode((W, H))
-pygame.display.set_caption = "Feed the Dragon" 
+pygame.display.set_caption = "Feed the Dragon"
 
 # Define Colors
 GREEN = (0, 255, 0)
@@ -22,36 +22,36 @@ FPS = 60
 clock = pygame.time.Clock()
 
 # Load sound effects
-successful_chomp = pygame.mixer.Sound('sound_1.wav')
-missed_coin = pygame.mixer.Sound('sound_2.wav')
-successful_chomp.set_volume(.2)
-missed_coin.set_volume(.2)
+successful_chomp = pygame.mixer.Sound("sound_1.wav")
+missed_coin = pygame.mixer.Sound("sound_2.wav")
+successful_chomp.set_volume(0.2)
+missed_coin.set_volume(0.2)
 
 # Load background music
-music = pygame.mixer.music.load('music.wav')
+music = pygame.mixer.music.load("music.wav")
 pygame.mixer.music.set_volume(0.3)
 pygame.mixer.music.play(-1, 0.0)
 
 # Define fonts
-game_font = pygame.font.Font('AttackGraffiti.ttf', 32)
+game_font = pygame.font.Font("AttackGraffiti.ttf", 32)
 
 # Set up game texts
-game_name = game_font.render("Feed the Dragon", True, GREEN, WHITE) 
+game_name = game_font.render("Feed the Dragon", True, GREEN, WHITE)
 game_name_rect = game_name.get_rect()
-game_name_rect.center = (W//2, 50) 
+game_name_rect.center = (W // 2, 50)
 
 score_text = game_font.render("Score:", True, GREEN, DARK_GREEN)
 score_text_rect = score_text.get_rect()
-score_text_rect.center = (100, 50) 
+score_text_rect.center = (100, 50)
 
 lives_text = game_font.render("Lives:", True, GREEN, DARK_GREEN)
 lives_text_rect = lives_text.get_rect()
-lives_text_rect.center = (W-150, 50)
+lives_text_rect.center = (W - 150, 50)
 
 actual_lives = 5
 actual_lives_text = game_font.render(str(actual_lives), True, GREEN, DARK_GREEN)
 actual_lives_rect = actual_lives_text.get_rect()
-actual_lives_rect.center = (W-85, 50)
+actual_lives_rect.center = (W - 85, 50)
 
 actual_score = 0
 actual_score_text = game_font.render(str(actual_score), True, GREEN, DARK_GREEN)
@@ -60,23 +60,27 @@ actual_score_rect.center = (185, 50)
 
 game_over_text = game_font.render("GAME OVER", True, GREEN, DARK_GREEN)
 game_over_rect = game_over_text.get_rect()
-game_over_rect.center = (W//2, H//2) 
+game_over_rect.center = (W // 2, H // 2)
 
-continue_text = game_font.render("Hit any button to play again", True, GREEN, DARK_GREEN)
+continue_text = game_font.render(
+    "Hit any button to play again", True, GREEN, DARK_GREEN
+)
 continue_text_rect = continue_text.get_rect()
-continue_text_rect.center = (W//2, H//2 + 34)
+continue_text_rect.center = (W // 2, H // 2 + 34)
 
 # Add dragon image
-dragon = pygame.image.load('dragon_right.png')
+dragon = pygame.image.load("dragon_right.png")
 dragon_rect = dragon.get_rect()
 dragon_rect.x = 50
 dragon_rect.y = 120
 
 # Add the first coin spawn on the right side of the board
-coin = pygame.image.load('coin.png')
+coin = pygame.image.load("coin.png")
 coin_rect = coin.get_rect()
-coin_rect.x = W-40
-coin_rect.y = random.randint(120, H-32) # Making sure the coin does not initially spawn off the board.
+coin_rect.x = W - 40
+coin_rect.y = random.randint(
+    120, H - 32
+)  # Making sure the coin does not initially spawn off the board.
 
 # Main game loop:
 running = True
@@ -107,23 +111,23 @@ while running:
         actual_score_text = game_font.render(str(actual_score), True, GREEN, DARK_GREEN)
         V += 2  # Increase velocity every time you successfully eat a coin
         successful_chomp.play()
-        coin_rect.x = W-40
-        coin_rect.y = random.randint(120, H-32)
+        coin_rect.x = W - 40
+        coin_rect.y = random.randint(120, H - 32)
         game_board.blit(actual_score_text, actual_score_rect)
 
     if coin_rect.left <= 0:
         actual_lives -= 1
-        V = 5    # Reset the velocity once a wall has been struck.
+        V = 5  # Reset the velocity once a wall has been struck.
         missed_coin.play()
         actual_lives_text = game_font.render(str(actual_lives), True, GREEN, DARK_GREEN)
-        coin_rect.x = W-40 
-        coin_rect.y = random.randint(120, H-32)
+        coin_rect.x = W - 40
+        coin_rect.y = random.randint(120, H - 32)
 
     # Check for game over condition and restart as necessary
     if actual_lives <= 0:
         game_board.blit(game_over_text, game_over_rect)
         game_board.blit(continue_text, continue_text_rect)
-        pygame.display.update()  
+        pygame.display.update()
 
         # Pause game until player presses a key, then reset the game.
         pygame.mixer.music.stop()
@@ -132,17 +136,21 @@ while running:
             for event in pygame.event.get():
                 if event.type == pygame.KEYDOWN:
                     actual_lives = 5
-                    actual_lives_text = game_font.render(str(actual_lives), True, GREEN, DARK_GREEN)
+                    actual_lives_text = game_font.render(
+                        str(actual_lives), True, GREEN, DARK_GREEN
+                    )
                     actual_score = 0
-                    actual_score_text = game_font.render(str(actual_score), True, GREEN, DARK_GREEN)
-                    dragon_rect.y = W//2
-                    V =  5
+                    actual_score_text = game_font.render(
+                        str(actual_score), True, GREEN, DARK_GREEN
+                    )
+                    dragon_rect.y = W // 2
+                    V = 5
                     pygame.mixer.music.play(-1, 0.0)
                     is_paused = False
                 if event.type == pygame.QUIT:
                     is_paused = False
                     running = False
-        
+
     # Fill the gameboard to cover up old images
     game_board.fill(BLACK)
 
@@ -166,4 +174,3 @@ while running:
 
 # End the game
 pygame.quit()
-            
